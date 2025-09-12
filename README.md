@@ -20,7 +20,7 @@ A fast and simple QR code generator built with FastAPI and Python. Generate QR c
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/QR_CODE_GENERATOR.git
+   git clone https://bitbucket.org/datavoice/qr_code_generator.git
    cd QR_CODE_GENERATOR
    ```
 
@@ -32,14 +32,15 @@ A fast and simple QR code generator built with FastAPI and Python. Generate QR c
 
 3. Install the required packages:
    ```bash
-   pip install -r requirements.txt
+   pip install -r backend/requirements.txt
    ```
 
 ## Running the Application
 
-1. Start the FastAPI development server:
+1. Navigate to the backend directory and start the FastAPI development server:
    ```bash
-   uvicorn main:app --reload
+   cd backend
+   uvicorn app.main:app --reload
    ```
 
 2. Open your web browser and navigate to:
@@ -63,13 +64,19 @@ A fast and simple QR code generator built with FastAPI and Python. Generate QR c
 
 ```
 QR_CODE_GENERATOR/
-├── static/
-│   └── qrcodes/          # Generated QR codes are stored here
-├── templates/
-│   └── index.html        # Frontend template
-├── main.py               # FastAPI application
-├── requirements.txt      # Python dependencies
-└── README.md            # This file
+├── backend/
+│   ├── app/
+│   │   ├── __init__.py
+│   │   └── main.py          # FastAPI application
+│   ├── persistent_storage/  # Persistent storage for QR codes
+│   │   └── qrcodes/
+│   └── requirements.txt     # Python dependencies
+├── frontend/
+│   ├── static/
+│   │   └── logo.jpg
+│   └── templates/
+│       └── index.html       # Frontend template
+└── README.md               # This file
 ```
 
 ## License
