@@ -1,2 +1,4 @@
 #!/bin/bash
-uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+
+# Execute the backend start script
+cd "$(dirname "$0")/backend" && exec bash start.sh
