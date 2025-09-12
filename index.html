@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Redirecting to App Store...</title>
+    <script>
+        const userAgent = navigator.userAgent.toLowerCase();
+        if (/android/.test(userAgent)) {
+            window.location.href = "https://play.google.com/store/apps/details?id=in.co.datavoice.rbus";
+        } else if (/iphone|ipad|ipod/.test(userAgent)) {
+            window.location.href = "https://apps.apple.com/in/app/rbus/id6749367266";
+        } else {
+            window.location.href = "https://play.google.com/store/apps/details?id=in.co.datavoice.rbus";
+        }
+    </script>
+</head>
+<body>
+    <p>Redirecting to app store...</p>
+</body>
+</html>
