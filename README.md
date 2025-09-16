@@ -1,13 +1,25 @@
 # QR Code Generator
 
-A fast and simple QR code generator built with FastAPI and Python. Generate QR codes that never expire and can be downloaded or shared easily.
+A modern web application for generating QR codes with various customization options, built with FastAPI and React. Generate QR codes that never expire and can be downloaded or shared easily.
 
 ## Features
 
-- Generate QR codes from text or URLs
-- Download QR codes as PNG images
-- Share QR codes directly from the app
-- Modern, responsive UI
+- Generate QR codes from various sources:
+  - URLs
+  - vCards (contact information)
+  - WiFi network credentials
+  - Email addresses
+  - SMS messages
+  - And more...
+  
+- Advanced customization options:
+  - Custom foreground and background colors
+  - Adjustable size and border
+  - Multiple output formats (PNG, SVG, PDF)
+  - Error correction levels
+  
+- Modern, responsive React-based UI
+- FastAPI backend with RESTful API
 - No expiration - QR codes are saved as static files
 - Custom filenames for generated QR codes
 
@@ -18,34 +30,47 @@ A fast and simple QR code generator built with FastAPI and Python. Generate QR c
 
 ## Installation
 
-1. Clone the repository:
+### Backend Setup
+
+1. Navigate to the backend directory:
    ```bash
-   git clone https://bitbucket.org/datavoice/qr_code_generator.git
-   cd QR_CODE_GENERATOR
+   cd backend
    ```
 
-2. Create a virtual environment (recommended):
+2. Install Python dependencies:
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows use: .\venv\Scripts\activate
+   pip install -r requirements.txt
    ```
 
-3. Install the required packages:
+3. Start the FastAPI server:
    ```bash
-   pip install -r backend/requirements.txt
+   uvicorn app.main:app --reload
    ```
+   The API will be available at `http://localhost:8000`
+
+### Frontend Setup
+
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend-react
+   ```
+
+2. Install Node.js dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the React development server:
+   ```bash
+   npm start
+   ```
+   The application will open in your default browser at `http://localhost:3000`
 
 ## Running the Application
 
-1. Navigate to the backend directory and start the FastAPI development server:
-   ```bash
-   cd backend
-   uvicorn app.main:app --reload
+1. Open your web browser and navigate to:
    ```
-
-2. Open your web browser and navigate to:
-   ```
-   http://127.0.0.1:8000
+   http://localhost:3000
    ```
 
 ## Usage
@@ -54,6 +79,12 @@ A fast and simple QR code generator built with FastAPI and Python. Generate QR c
 2. (Optional) Specify a custom filename for the QR code
 3. Click "Generate QR Code"
 4. Download or share the generated QR code
+
+## API Documentation
+
+Once the backend server is running, you can access the interactive API documentation at:
+- Swagger UI: `http://localhost:8000/docs`
+- ReDoc: `http://localhost:8000/redoc`
 
 ## API Endpoints
 

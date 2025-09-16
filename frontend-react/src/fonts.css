@@ -1,0 +1,47 @@
+/* Using Google Fonts as fallback since custom font files are not provided */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Using Montserrat as a fallback for Molika Sans */
+  --font-sans: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Using Playfair Display as a fallback for Kapital */
+  --font-heading: 'Playfair Display', Georgia, 'Times New Roman', serif;
+}
+
+/* If you have the actual font files, you can uncomment and update the paths below */
+/*
+@font-face {
+  font-family: 'Molika Sans';
+  src: local('MolikaSans-Light'),
+       url('/fonts/MolikaSans-Light.woff2') format('woff2'),
+       url('/fonts/MolikaSans-Light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Molika Sans';
+  src: local('MolikaSans-Regular'),
+       url('/fonts/MolikaSans-Regular.woff2') format('woff2'),
+       url('/fonts/MolikaSans-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kapital';
+  src: local('Kapital-Regular'),
+       url('/fonts/Kapital-Regular.woff2') format('woff2'),
+       url('/fonts/Kapital-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-sans: 'Molika Sans', 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-heading: 'Kapital', 'Playfair Display', Georgia, 'Times New Roman', serif;
+}
+*/
