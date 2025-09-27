@@ -44,7 +44,7 @@ const DynamicLinkForm = () => {
     if (isEditMode) {
       fetchLink();
     }
-  }, [id]);
+  }, [id, isEditMode, fetchLink]);
 
   const fetchLink = async () => {
     try {
@@ -93,14 +93,6 @@ const DynamicLinkForm = () => {
     }
   };
 
-  const generateDynamicLink = (shortCode) => {
-    const baseUrl = process.env.REACT_APP_PUBLIC_URL || window.location.origin;
-    const link = `${baseUrl}/d/${shortCode}`;
-    setGeneratedLink(link);
-    setShowQrCode(true);
-    showSnackbar('Dynamic link copied to clipboard');
-    navigator.clipboard.writeText(link);
-  };
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);

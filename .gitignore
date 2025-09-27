@@ -41,3 +41,9 @@ ENV/
 
 # Project specific
 static/qrcodes/*.png
+
+
+# React build/cache
+frontend-react/node_modules/
+frontend-react/node_modules/.cache/
+frontend-react/build/

@@ -1,7 +1,8 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { FiDownload, FiCopy, FiImage, FiUpload, FiSquare, FiCircle, FiBox, FiAward, FiX } from 'react-icons/fi';
+import { FiDownload, FiCopy, FiUpload, FiSquare, FiCircle, FiBox, FiAward, FiX } from 'react-icons/fi';
 import './LogoSection.css';
+import './QRForm.css';
 
 // QR Code Types
 const QR_TYPES = {
@@ -19,7 +20,7 @@ const EnhancedQRCode = () => {
   // QR Code State
   const [qrType, setQrType] = useState(QR_TYPES.URL);
   const [qrData, setQrData] = useState('https://example.com');
-  const [size, setSize] = useState(256);
+  const [size, setSize] = useState(139);
   const [fgColor, setFgColor] = useState('#000000');
   const [bgColor, setBgColor] = useState('#ffffff');
   const [logo, setLogo] = useState('');
@@ -297,8 +298,57 @@ const EnhancedQRCode = () => {
   
   // Refs
   const qrRef = useRef(null);
+  const canvasRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
+
+  // Keep the canvas in sync with the QR code display
+  useEffect(() => {
+    if (qrRef.current && canvasRef.current) {
+      const svg = qrRef.current.querySelector('svg');
+      if (svg) {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        
+        // Clear the canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw the QR code on the canvas
+        const svgData = new XMLSerializer().serializeToString(svg);
+        const img = new Image();
+        
+        img.onload = () => {
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          
+          // If there's a logo, draw it in the center
+          if (logo) {
+            const logoImg = new Image();
+            logoImg.onload = () => {
+              const logoSize = Math.min(canvas.width, canvas.height) * 0.2; // 20% of QR code size
+              const x = (canvas.width - logoSize) / 2;
+              const y = (canvas.height - logoSize) / 2;
+              
+              // Draw a white background for the logo
+              ctx.fillStyle = '#ffffff';
+              const padding = logoSize * 0.1; // 10% padding
+              ctx.fillRect(
+                x - padding, 
+                y - padding, 
+                logoSize + padding * 2, 
+                logoSize + padding * 2
+              );
+              
+              // Draw the logo
+              ctx.drawImage(logoImg, x, y, logoSize, logoSize);
+            };
+            logoImg.src = logo;
+          }
+        };
+        
+        img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+      }
+    }
+  }, [qrType, qrData, size, fgColor, bgColor, logo, qrShape]);
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -341,33 +391,65 @@ const EnhancedQRCode = () => {
 
   // Download QR Code
   const downloadQRCode = () => {
-    if (qrRef.current) {
-      const canvas = qrRef.current.querySelector('canvas');
-      if (canvas) {
-        const link = document.createElement('a');
-        link.download = 'qrcode.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-      }
+    if (canvasRef.current) {
+      const link = document.createElement('a');
+      link.download = `qrcode-${new Date().getTime()}.png`;
+      link.href = canvasRef.current.toDataURL('image/png');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
   };
 
   // Copy QR Code to clipboard
   const copyQRCode = async () => {
-    if (navigator.clipboard && qrRef.current) {
-      const canvas = qrRef.current.querySelector('canvas');
-      if (canvas) {
-        try {
-          const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-          await navigator.clipboard.write([
-            new ClipboardItem({ 'image/png': blob })
-          ]);
-          alert('QR Code copied to clipboard!');
-        } catch (err) {
-          console.error('Failed to copy:', err);
-        }
+    if (!canvasRef.current) return;
+    
+    try {
+      // First try the modern API
+      if (navigator.clipboard && window.ClipboardItem) {
+        const blob = await new Promise(resolve => 
+          canvasRef.current.toBlob(resolve, 'image/png')
+        );
+        await navigator.clipboard.write([
+          new window.ClipboardItem({ 'image/png': blob })
+        ]);
+        alert('QR Code copied to clipboard!');
+        return;
       }
+      
+      // Fallback for browsers that don't support ClipboardItem
+      canvasRef.current.toBlob(blob => {
+        const item = new ClipboardItem({ 'image/png': blob });
+        navigator.clipboard.write([item]).then(
+          () => alert('QR Code copied to clipboard!'),
+          () => fallbackCopyToClipboard()
+        );
+      });
+    } catch (err) {
+      console.error('Failed to copy:', err);
+      fallbackCopyToClipboard();
     }
+  };
+  
+  // Fallback copy method
+  const fallbackCopyToClipboard = () => {
+    // Create a temporary textarea to copy the URL
+    const textArea = document.createElement('textarea');
+    textArea.value = generateQRCode();
+    document.body.appendChild(textArea);
+    textArea.select();
+    
+    try {
+      const successful = document.execCommand('copy');
+      const msg = successful ? 'URL copied to clipboard!' : 'Failed to copy';
+      alert(msg);
+    } catch (err) {
+      console.error('Fallback copy failed:', err);
+      alert('Failed to copy. Please try manually.');
+    }
+    
+    document.body.removeChild(textArea);
   };
 
   // Generate QR code data based on type
@@ -596,7 +678,7 @@ const EnhancedQRCode = () => {
               />
             </div>
             <div className="form-row">
-              <div className="form-group form-group-half">
+              <div className="form-group form-group-third" style={{ height: '38px' }}>
                 <label>Phone</label>
                 <input
                   type="tel"
@@ -606,26 +688,26 @@ const EnhancedQRCode = () => {
                   placeholder="+1234567890"
                 />
               </div>
-              <div className="form-group form-group-half">
+              <div className="form-group form-group-third" style={{ height: '38px' }}>
                 <label>Email</label>
                 <input
                   type="email"
                   name="vcard.email"
                   value={formData.vcard.email}
                   onChange={handleInputChange}
-                  placeholder="you@example.com"
+                  placeholder="your.email@example.com"
                 />
               </div>
-            </div>
-            <div className="form-group">
-              <label>Website</label>
-              <input
-                type="url"
-                name="vcard.website"
-                value={formData.vcard.website}
-                onChange={handleInputChange}
-                placeholder="https://example.com"
-              />
+              <div className="form-group form-group-third" style={{ height: '38px' }}>
+                <label>Website</label>
+                <input
+                  type="url"
+                  name="vcard.website"
+                  value={formData.vcard.website}
+                  onChange={handleInputChange}
+                  placeholder="https://example.com"
+                />
+              </div>
             </div>
             <div className="form-group">
               <label>Address</label>
@@ -719,7 +801,7 @@ const EnhancedQRCode = () => {
 
       case QR_TYPES.EVENT:
         return (
-          <>
+          <div>
             <div className="form-group">
               <label>Event Title</label>
               <input
@@ -729,6 +811,7 @@ const EnhancedQRCode = () => {
                 onChange={handleInputChange}
                 placeholder="Event Name"
                 required
+                style={{ height: '38px' }}
               />
             </div>
             <div className="form-group">
@@ -738,27 +821,29 @@ const EnhancedQRCode = () => {
                 name="event.location"
                 value={formData.event.location}
                 onChange={handleInputChange}
-                placeholder="Event Location"
+                placeholder="Event location"
+                style={{ height: '38px' }}
               />
             </div>
             <div className="form-row">
               <div className="form-group form-group-half">
-                <label>Start Date & Time</label>
+                <label>Start Date/Time</label>
                 <input
                   type="datetime-local"
                   name="event.start"
                   value={formData.event.start}
                   onChange={handleInputChange}
-                  required
+                  style={{ height: '38px' }}
                 />
               </div>
               <div className="form-group form-group-half">
-                <label>End Date & Time</label>
+                <label>End Date/Time</label>
                 <input
                   type="datetime-local"
                   name="event.end"
                   value={formData.event.end}
                   onChange={handleInputChange}
+                  style={{ height: '38px' }}
                 />
               </div>
             </div>
@@ -770,9 +855,10 @@ const EnhancedQRCode = () => {
                 onChange={handleInputChange}
                 placeholder="Event description..."
                 rows={3}
+                style={{ minHeight: '80px', resize: 'vertical' }}
               />
             </div>
-          </>
+          </div>
         );
 
       default:
@@ -1018,14 +1104,22 @@ const EnhancedQRCode = () => {
                       boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
                       position: 'relative'
                     }}>
-                      <QRCodeSVG
-                        value={generateQRCode()}
-                        size={size}
-                        fgColor={fgColor}
-                        bgColor={bgColor}
-                        level="H"
-                        includeMargin={false}
-                      />
+                      <div ref={qrRef}>
+                        <QRCodeSVG
+                          value={generateQRCode()}
+                          size={size}
+                          fgColor={fgColor}
+                          bgColor={bgColor}
+                          level="H"
+                          includeMargin={false}
+                        />
+                        <canvas 
+                          ref={canvasRef} 
+                          style={{ display: 'none' }} 
+                          width={size} 
+                          height={size}
+                        />
+                      </div>
                       {logo && (
                         <div style={{
                           position: 'absolute',

@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import { FiMenu, FiGlobe, FiMail, FiPhone, FiCopy } from 'react-icons/fi';
 import { FaLinkedin } from 'react-icons/fa';
+import UserMenu from '../auth/UserMenu';
 
 function HideOnScroll({ children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -85,7 +86,9 @@ function MainLayout() {
                 display: 'flex', 
                 alignItems: 'center',
                 width: '100%',
-                justifyContent: 'center'
+                justifyContent: 'flex-start',
+                px: 2,
+                position: 'relative'
               }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <a 
@@ -139,7 +142,16 @@ function MainLayout() {
                     </Typography>
                   </a>
                 </Box>
-                <Box sx={{ display: { xs: 'none', md: 'flex' }, ml: 4, gap: 2 }}>
+                
+                {/* Navigation Buttons - Centered */}
+                <Box sx={{ 
+                  position: 'absolute',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 2
+                }}>
                   <Button 
                     component={Link}
                     to="/"
@@ -189,134 +201,115 @@ function MainLayout() {
                     Dynamic Links
                   </Button>
                 </Box>
-              </Box>
-              
-              <Box sx={{ 
-                position: 'absolute',
-                right: '24px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1
-              }}>
-                <IconButton 
-                  href="https://www.datavoice.co.in/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  size="small"
-                  sx={{ 
-                    color: 'inherit',
-                    '&:hover': {
-                      color: '#085b88' // Same blue as LinkedIn hover
-                    }
-                  }}
-                  title="https://www.datavoice.co.in"
-                >
-                  <FiGlobe />
-                </IconButton>
-                <IconButton 
-                  href="https://www.linkedin.com/company/datavoice-solutions/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  size="small"
-                  sx={{ 
-                    color: 'inherit',
-                    '&:hover': {
-                      color: '#0a66c2' // Slightly brighter blue for better visibility
-                    }
-                  }}
-                  title="https://www.linkedin.com/company/datavoice-solutions/"
-                >
-                  <FaLinkedin />
-                </IconButton>
-                {/* Email with hover and click tooltip */}
-                <Tooltip 
-                  title={
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <span>info@datavoice.co.in</span>
-                      <IconButton 
-                        size="small" 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          copyToClipboard('info@datavoice.co.in');
-                        }}
-                        sx={{ p: 0.5, color: 'white' }}
-                      >
-                        <FiCopy size={14} />
-                      </IconButton>
-                    </Box>
-                  }
-                  arrow
-                  placement="bottom"
-                  enterTouchDelay={0}
-                >
+                </Box>
+                
+                {/* Contact Icons - Pushed to the right */}
+                <Box sx={{ 
+                  marginLeft: 'auto', 
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1
+                }}>
                   <IconButton 
-                    component="a"
-                    href="mailto:info@datavoice.co.in"
+                    href="https://www.datavoice.co.in/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
                     size="small"
                     sx={{ 
                       color: 'inherit',
                       '&:hover': {
-                        color: '#d44638' // Gmail red color for email
+                        color: '#085b88'
                       }
                     }}
+                    title="https://www.datavoice.co.in"
                   >
-                    <FiMail />
+                    <FiGlobe />
                   </IconButton>
-                </Tooltip>
-
-                {/* Phone with hover and click tooltip */}
-                <Tooltip 
-                  title={
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <span>+91 86552 55211</span>
-                      <IconButton 
-                        size="small" 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          copyToClipboard('+918655255211');
-                        }}
-                        sx={{ p: 0.5, color: 'white' }}
-                      >
-                        <FiCopy size={14} />
-                      </IconButton>
-                    </Box>
-                  }
-                  arrow
-                  placement="bottom"
-                  enterTouchDelay={0}
-                >
                   <IconButton 
-                    component="a"
-                    href="tel:+918655255211"
+                    href="https://www.linkedin.com/company/datavoice-solutions/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
                     size="small"
                     sx={{ 
                       color: 'inherit',
                       '&:hover': {
-                        color: '#34a853' // Green color for phone
+                        color: '#0a66c2'
                       }
                     }}
+                    title="https://www.linkedin.com/company/datavoice-solutions/"
                   >
-                    <FiPhone />
+                    <FaLinkedin />
                   </IconButton>
-                </Tooltip>
-                <Button 
-                  variant="contained" 
-                  color="primary" 
-                  href="/dynamic"
-                  size="small"
-                  sx={{ 
-                    fontWeight: 600,
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                    '&:hover': {
-                      boxShadow: '0 4px 8px rgba(0,0,0,0.15)',
-                    },
-                  }}
-                >
-                  Get Started
-                </Button>
-              </Box>
+                  <Tooltip 
+                    title={
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <span>info@datavoice.co.in</span>
+                        <IconButton 
+                          size="small" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            copyToClipboard('info@datavoice.co.in');
+                          }}
+                          sx={{ p: 0.5, color: 'white' }}
+                        >
+                          <FiCopy size={14} />
+                        </IconButton>
+                      </Box>
+                    }
+                    arrow
+                    placement="bottom"
+                    enterTouchDelay={0}
+                  >
+                    <IconButton 
+                      component="a"
+                      href="mailto:info@datavoice.co.in"
+                      size="small"
+                      sx={{ 
+                        color: 'inherit',
+                        '&:hover': {
+                          color: '#d44638'
+                        }
+                      }}
+                    >
+                      <FiMail />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip 
+                    title={
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <span>+91 86552 55211</span>
+                        <IconButton 
+                          size="small" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            copyToClipboard('+918655255211');
+                          }}
+                          sx={{ p: 0.5, color: 'white' }}
+                        >
+                          <FiCopy size={14} />
+                        </IconButton>
+                      </Box>
+                    }
+                    arrow
+                    placement="bottom"
+                    enterTouchDelay={0}
+                  >
+                    <IconButton 
+                      component="a"
+                      href="tel:+918655255211"
+                      size="small"
+                      sx={{ 
+                        color: 'inherit',
+                        '&:hover': {
+                          color: '#34a853'
+                        }
+                      }}
+                    >
+                      <FiPhone />
+                    </IconButton>
+                  </Tooltip>
+                  <UserMenu />
+                </Box>
             </Toolbar>
           </Container>
         </AppBar>

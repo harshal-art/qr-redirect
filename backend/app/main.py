@@ -49,11 +49,38 @@ app = FastAPI(
 # CORS middleware configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # React dev server
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=["*"],  # Allow all origins for development
+    allow_credentials=False,  # Set to False when allow_origins is ["*"]
+    allow_methods=["*"],  # Allow all methods
+    allow_headers=["*"],  # Allow all headers
+    expose_headers=["*"],  # Expose all headers to the client
 )
+
+# Add CORS headers middleware for preflight requests
+@app.middleware("http")
+async def add_cors_headers(request: Request, call_next):
+    if request.method == "OPTIONS":
+        response = Response(
+            status_code=200,
+            headers={
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization",
+                "Access-Control-Max-Age": "600"  # 10 minutes
+            }
+        )
+        return response
+    
+    response = await call_next(request)
+    
+    # Add CORS headers to all responses
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    response.headers["Access-Control-Allow-Credentials"] = "false"
+    response.headers["Access-Control-Max-Age"] = "600"  # 10 minutes
+    
+    return response
 
 # Include routers
 app.include_router(dynamic_links_router, prefix="/api")
@@ -711,9 +738,14 @@ def add_logo_to_qr(qr_img: Image.Image, logo_url: str) -> Image.Image:
         return qr_img  # Return original if there's an error
 
 # Define root endpoint
-@app.get("/", response_class=HTMLResponse)
+@app.get("/")
 async def read_root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return {"message": "Welcome to QR Code Generator API"}
+
+@app.get("/api/health")
+async def health_check():
+    """Health check endpoint to verify the API is running."""
+    return {"status": "ok", "version": "1.0.0", "service": "QR Code Generator API"}
 
 # Define QR code generation endpoint
 @app.post("/api/generate")

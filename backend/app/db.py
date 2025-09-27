@@ -59,29 +59,47 @@ async def create_indexes():
             IndexModel([("device.os", ASCENDING)], name="link_click_device_os_idx"),
             IndexModel([("device.browser", ASCENDING)], name="link_click_device_browser_idx"),
         ])
-        
         logger.info("Database indexes created successfully")
     except Exception as e:
         logger.error(f"Error creating database indexes: {e}")
         raise
 
-async def get_dynamic_qr_by_short_code(short_code: str) -> Optional[Dict[str, Any]]:
+async def get_dynamic_qr_by_short_code(short_code: str):
     """Retrieve a dynamic QR code by its short code."""
     try:
-        qr_data = await db[DYNAMIC_QR_COLLECTION].find_one(
-            {"short_code": short_code, "is_active": True}
-        )
-        if qr_data:
+        qr_code = await db[DYNAMIC_QR_COLLECTION].find_one({
+            "short_code": short_code,
+            "is_active": True
+        })
+        if qr_code:
             # Convert ObjectId to string for JSON serialization
-            qr_data["id"] = str(qr_data.pop("_id"))
-            # Convert datetime objects to ISO format strings
-            for field in ["created_at", "updated_at", "last_scan"]:
-                if field in qr_data and qr_data[field] is not None:
-                    qr_data[field] = qr_data[field].isoformat()
-        return qr_data
-    except Exception as e:
-        logger.error(f"Error retrieving QR code {short_code}: {e}")
+            qr_code["id"] = str(qr_code["_id"])
+            return qr_code
         return None
+    except Exception as e:
+        logger.error(f"Error getting dynamic QR code by short code: {str(e)}")
+        raise
+
+
+async def get_dynamic_qr_by_id(qr_id: str):
+    """Retrieve a dynamic QR code by its ID."""
+    try:
+        if not ObjectId.is_valid(qr_id):
+            return None
+            
+        qr_code = await db[DYNAMIC_QR_COLLECTION].find_one({
+            "_id": ObjectId(qr_id),
+            "is_active": True
+        })
+        if qr_code:
+            # Convert ObjectId to string for JSON serialization
+            qr_code["id"] = str(qr_code["_id"])
+            return qr_code
+        return None
+    except Exception as e:
+        logger.error(f"Error getting dynamic QR code by ID: {str(e)}")
+        raise
+
 
 async def create_dynamic_qr(qr_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """Create a new dynamic QR code."""

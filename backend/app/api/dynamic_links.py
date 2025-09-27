@@ -51,16 +51,49 @@ async def create_dynamic_link(link_data: Dict[str, str]):
     
     return link
 
+# Create index on startup
+@router.on_event("startup")
+async def create_indexes():
+    await db.dynamic_links.create_index([("is_active", 1), ("created_at", -1)])
+
 @router.get("/", response_model=list[DynamicLink])
-async def list_dynamic_links():
-    """List all dynamic links"""
+async def list_dynamic_links(limit: int = 20, skip: int = 0):
+    """
+    List dynamic links with pagination
+    
+    Args:
+        limit: Number of links to return (max 50)
+        skip: Number of links to skip
+        
+    Returns:
+        List of dynamic links with pagination metadata
+    """
+    # Ensure limit is reasonable
+    limit = min(50, max(1, limit))
+    
+    # Only fetch required fields
+    projection = {
+        "name": 1,
+        "short_code": 1,
+        "android_url": 1,
+        "ios_url": 1,
+        "fallback_url": 1,
+        "created_at": 1,
+        "total_clicks": 1,
+        "is_active": 1
+    }
+    
+    cursor = db.dynamic_links.find(
+        {"is_active": True},
+        projection=projection
+    ).sort("created_at", -1).skip(skip).limit(limit)
+    
     links = []
-    async for link in db.dynamic_links.find({"is_active": True}).sort("created_at", -1):
-        # Ensure all required fields are present
-        link.setdefault("name", "Unnamed Link")  # Provide default name if missing
+    async for link in cursor:
         link["id"] = str(link["_id"])
         del link["_id"]
         links.append(link)
+        
     return links
 
 @router.get("/{short_code}", response_model=DynamicLink)
